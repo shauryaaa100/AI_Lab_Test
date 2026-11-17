@@ -1,0 +1,434 @@
+# AI Lab Test – 17 November 2026
+## Complete Solutions
+
+The paper contains two questions. Below are the solutions with the required predicates, logical expressions, explanations and C++ code wherever applicable. AI_Lab Test 17Nov
+
+# Q1. Blocks World – Predicates and Goal Stack
+
+### 1. Initial State
+
+Blocks A, B, C and D are all placed on the table.
+
+We represent this using the following predicates:
+
+- `ON(x,y)` – Block x is on block y.
+- `ONTABLE(x)` – Block x is on the table.
+- `CLEAR(x)` – Nothing is placed on top of block x.
+- `HOLDING(x)` – Robot is holding block x.
+- `ARMEMPTY` – Robot's arm is empty.
+
+Initial state:
+
+```text
+ONTABLE(A)
+ONTABLE(B)
+ONTABLE(C)
+ONTABLE(D)
+
+CLEAR(A)
+CLEAR(B)
+CLEAR(C)
+CLEAR(D)
+
+ARMEMPTY
+```
+
+### 2. Goal State
+
+The goal is:
+- Block A should be placed over block C.
+- Block D should be placed over block B.
+
+Therefore, the goal predicates are:
+
+```text
+ON(A,C)
+ON(D,B)
+```
+
+### 3. Operators Used
+
+**PICKUP(x)**
+
+Preconditions:
+```text
+ONTABLE(x)
+CLEAR(x)
+ARMEMPTY
+```
+Add:
+```text
+HOLDING(x)
+```
+Delete:
+```text
+ONTABLE(x)
+CLEAR(x)
+ARMEMPTY
+```
+
+**STACK(x,y)**
+
+Preconditions:
+```text
+HOLDING(x)
+CLEAR(y)
+```
+Add:
+```text
+ON(x,y)
+CLEAR(x)
+ARMEMPTY
+```
+Delete:
+```text
+HOLDING(x)
+CLEAR(y)
+```
+
+### 4. Goal Stack
+
+We need to achieve both `ON(A,C)` and `ON(D,B)`.
+
+The goal stack can be solved using the following sequence:
+
+| Step | Action | Result |
+|---|---|---|
+| 1 | PICKUP(A) | Robot picks up A |
+| 2 | STACK(A,C) | A is placed on C |
+| 3 | PICKUP(D) | Robot picks up D |
+| 4 | STACK(D,B) | D is placed on B |
+
+Final state:
+
+```text
+ON(A,C)
+ON(D,B)
+ONTABLE(B)
+ONTABLE(C)
+CLEAR(A)
+CLEAR(D)
+ARMEMPTY
+```
+
+**Hence, both goals are achieved.**
+
+---
+
+# Q2. Knowledge-Based System for Research Fellowship
+
+## (i) Represent all four university policies using First-Order Logic (FOL).
+
+**Policy 1: Every student studies at least one course.**
+
+```text
+∀x [Student(x) → ∃y (Course(y) ∧ Studies(x,y))]
+```
+
+**Policy 2: A student who studies a course and passes that same course is qualified for research.**
+
+```text
+∀x∀y [(Student(x) ∧ Course(y) ∧ Studies(x,y)
+       ∧ Passed(x,y)) → Qualified(x)]
+```
+
+**Policy 3: A qualified student supervised by a professor is considered a researcher.**
+
+```text
+∀x∀y [(Qualified(x) ∧ Professor(y)
+       ∧ Supervises(y,x)) → Researcher(x)]
+```
+
+**Policy 4: Every researcher is eligible for a research fellowship.**
+
+```text
+∀x [Researcher(x) → Eligible(x)]
+```
+
+## (ii) Does the given statement imply that every student studies the same course? Can we conclude that every student studies AI?
+
+Given statement:
+
+```text
+∀x (Student(x) → ∃y (Course(y) ∧ Studies(x,y)))
+```
+
+**Answer: No.**
+
+The statement says that every student studies at least one course.
+
+However, the existential quantifier (∃y) means that the course can be different for different students.
+
+For example:
+- Ravi studies AI.
+- Anu studies ML.
+
+Both satisfy the given statement, even though they study different courses.
+
+**Can we conclude that every student studies AI?**
+
+No. The statement does not specify which course each student studies. It only guarantees that each student studies at least one course.
+
+Therefore:
+- Every student studies at least one course: **True (guaranteed).**
+- Every student studies the same course: **Not necessarily true.**
+- Every student studies AI: **Cannot be concluded.**
+
+## (iii) Determine whether Eligible(Ravi) can be derived.
+
+We are given the following facts:
+
+```text
+Student(Ravi)
+Student(Anu)
+Course(AI)
+Course(ML)
+Studies(Ravi,AI)
+Passed(Ravi,AI)
+Studies(Anu,ML)
+Professor(DrSharma)
+Supervises(DrSharma,Ravi)
+```
+
+We apply the four rules step by step.
+
+**Step 1: Derive Qualified(Ravi)**
+
+Using Policy 2:
+
+```text
+Student(x) ∧ Course(y) ∧ Studies(x,y)
+∧ Passed(x,y) → Qualified(x)
+```
+
+Substituting x = Ravi and y = AI:
+
+```text
+Student(Ravi)
+Course(AI)
+Studies(Ravi,AI)
+Passed(Ravi,AI)
+```
+
+All conditions are satisfied.
+
+Therefore, we derive:
+
+```text
+Qualified(Ravi)
+```
+
+**Step 2: Derive Researcher(Ravi)**
+
+Using Policy 3:
+
+```text
+Qualified(x) ∧ Professor(y)
+∧ Supervises(y,x) → Researcher(x)
+```
+
+Substituting x = Ravi and y = DrSharma:
+
+```text
+Qualified(Ravi)
+Professor(DrSharma)
+Supervises(DrSharma,Ravi)
+```
+
+All conditions are satisfied.
+
+Therefore, we derive:
+
+```text
+Researcher(Ravi)
+```
+
+**Step 3: Derive Eligible(Ravi)**
+
+Using Policy 4:
+
+```text
+Researcher(x) → Eligible(x)
+```
+
+Substituting x = Ravi:
+
+```text
+Researcher(Ravi) → Eligible(Ravi)
+```
+
+Therefore, we derive:
+
+```text
+Eligible(Ravi)
+```
+
+### Final Conclusion
+
+**Yes, Ravi is eligible for a research fellowship.**
+
+The inference chain is:
+
+```text
+Student(Ravi)
+Course(AI)
+Studies(Ravi,AI)
+Passed(Ravi,AI)
+        |
+        v
+Qualified(Ravi)
+        |
+        v
+Researcher(Ravi)
+        |
+        v
+Eligible(Ravi)
+```
+
+# C++ Implementation
+
+Since this is an AI lab test, the following program demonstrates both **Blocks World planning (Q1)** and **forward chaining in a knowledge-based system (Q2)**.
+
+### Q1. C++ Code – Blocks World
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    // Initial state
+    set<string> onTable = {"A", "B", "C", "D"};
+    set<string> clear = {"A", "B", "C", "D"};
+    set<pair<string, string>> on;
+
+    bool armEmpty = true;
+
+    cout << "Initial State: All blocks are on the table.\n";
+
+    // Goal 1: Place A on C
+    if (onTable.count("A") && clear.count("A") && armEmpty) {
+        cout << "\n1. PICKUP(A)\n";
+        onTable.erase("A");
+        clear.erase("A");
+        armEmpty = false;
+
+        cout << "2. STACK(A,C)\n";
+        on.insert({"A", "C"});
+        clear.erase("C");
+        clear.insert("A");
+        armEmpty = true;
+    }
+
+    // Goal 2: Place D on B
+    if (onTable.count("D") && clear.count("D") && armEmpty) {
+        cout << "3. PICKUP(D)\n";
+        onTable.erase("D");
+        clear.erase("D");
+        armEmpty = false;
+
+        cout << "4. STACK(D,B)\n";
+        on.insert({"D", "B"});
+        clear.erase("B");
+        clear.insert("D");
+        armEmpty = true;
+    }
+
+    cout << "\nFinal State:\n";
+    for (auto p : on)
+        cout << "ON(" << p.first << "," << p.second << ")\n";
+
+    cout << "Goal Achieved!\n";
+
+    return 0;
+}
+```
+
+### Q2. C++ Code – Knowledge-Based System (Forward Chaining)
+
+This program applies the university policies as inference rules to determine whether Ravi is eligible for a research fellowship.
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    // Given facts
+    set<string> students = {"Ravi", "Anu"};
+    set<string> courses = {"AI", "ML"};
+    set<pair<string, string>> studies = {
+        {"Ravi", "AI"}, {"Anu", "ML"}
+    };
+    set<pair<string, string>> passed = {
+        {"Ravi", "AI"}
+    };
+    set<string> professors = {"DrSharma"};
+    set<pair<string, string>> supervises = {
+        {"DrSharma", "Ravi"}
+    };
+
+    set<string> qualified, researcher, eligible;
+
+    // Rule 1: Student studies at least one course
+    cout << "Checking students studying courses:\n";
+    for (auto s : students) {
+        for (auto c : courses) {
+            if (studies.count({s, c}))
+                cout << s << " studies " << c << endl;
+        }
+    }
+
+    // Rule 2: Student studies and passes same course
+    for (auto s : students) {
+        for (auto c : courses) {
+            if (studies.count({s, c}) &&
+                passed.count({s, c})) {
+                qualified.insert(s);
+                cout << "\nQualified(" << s << ")\n";
+            }
+        }
+    }
+
+    // Rule 3: Qualified student supervised by professor
+    for (auto s : qualified) {
+        for (auto p : professors) {
+            if (supervises.count({p, s})) {
+                researcher.insert(s);
+                cout << "Researcher(" << s << ")\n";
+            }
+        }
+    }
+
+    // Rule 4: Every researcher is eligible
+    for (auto s : researcher) {
+        eligible.insert(s);
+        cout << "Eligible(" << s << ")\n";
+    }
+
+    // Final result
+    cout << "\nFinal Result:\n";
+
+    if (eligible.count("Ravi"))
+        cout << "Ravi is eligible for research fellowship.\n";
+    else
+        cout << "Ravi is not eligible.\n";
+
+    return 0;
+}
+```
+
+**Expected Output (Q2):**
+
+```text
+Checking students studying courses:
+Ravi studies AI
+Anu studies ML
+
+Qualified(Ravi)
+Researcher(Ravi)
+Eligible(Ravi)
+
+Final Result:
+Ravi is eligible for research fellowship.
+```
+
+**Important:** Q1 is a simple goal-stack planning sequence, while Q2 implements forward chaining using facts and inference rules. These are two different AI problem-solving techniques.
